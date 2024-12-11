@@ -24,7 +24,7 @@ sudo apt-get install -y curl
   fi
 
   # Update apt package list and install Docker packages
-
+  sudo apt-get update -y
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
   # Restart Docker service
