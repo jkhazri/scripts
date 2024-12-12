@@ -56,6 +56,8 @@ sudo yum install ansible -y
 # Check if the OS is AlmaLinux and version 8.9
 OS_NAME=$(grep ^NAME= /etc/os-release | cut -d'=' -f2 | tr -d '"')
 OS_VERSION=$(grep ^VERSION= /etc/os-release | cut -d'=' -f2 | tr -d '"')
+echo "OS_NAME is: $OS_NAME"
+echo "OS_VERSION is: $OS_VERSION"
 
 if [[ "$OS_NAME" == "AlmaLinux" && "$OS_VERSION" == "8.9 (Midnight Oncilla)" ]]; then
     echo "LANG=en_US.UTF-8" > /etc/locale.conf
