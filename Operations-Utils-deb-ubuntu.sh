@@ -89,4 +89,5 @@ sudo apt install ansible -y
 
 
 #Installing jq and yq
-sudo apt-get install -y jq yq
+sudo apt-get install -y jq 
+sudo apt-get install -y yq
