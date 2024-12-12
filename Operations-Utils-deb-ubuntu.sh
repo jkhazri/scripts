@@ -90,4 +90,8 @@ sudo apt install ansible -y
 
 #Installing jq and yq
 sudo apt-get install -y jq 
-sudo apt-get install -y yq
+sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
+sudo mv yq_linux_amd64 /usr/bin/yq
+sudo chmod +x /usr/bin/yq
+
+
