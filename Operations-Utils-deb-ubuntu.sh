@@ -71,22 +71,16 @@ sudo chmod +x /usr/bin/yq
 
 # Check if the OS is Debian
 if [[ "$OS_NAME" == "Debian GNU/Linux 12 (bookworm)" ]]; then
-    echo "OS is Debian. Proceeding with locale configuration."
-
-    sudo apt-get update
     sudo apt-get install locales -y
-    sudo sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
-    sudo locale-gen en_US.UTF-8
-
+    echo "LANG=en_US.UTF-8" > /etc/locale.gen
+    echo "LC_ALL=C.UTF-8" >> /etc/environment
+    echo "LANG=C.UTF-8" >> /etc/environment
+    source /etc/locale.conf
     export LANG=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
-   echo "LC_ALL=C.UTF-8" >> /etc/environment
-   echo "LANG=C.UTF-8" >> /etc/environment
-
     echo "export LANG=en_US.UTF-8" >> /root/.bashrc
     echo "export LC_ALL=en_US.UTF-8" >> /root/.bashrc
     source /root/.bashrc
-
     echo "export LANG=en_US.UTF-8" >> /home/onecloud/.bashrc
     echo "export LC_ALL=en_US.UTF-8" >> /home/onecloud/.bashrc
     source /home/onecloud/.bashrc
