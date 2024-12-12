@@ -48,7 +48,21 @@ mv /tmp/terragrunt /usr/bin/terragrunt
 # ansible install
 sudo yum install epel-release -y
 sudo yum install ansible -y
+# Check if the OS is AlmaLinux and version 8.9
+OS_NAME=$(grep ^NAME= /etc/os-release | cut -d'=' -f2 | tr -d '"')
+OS_VERSION=$(grep ^VERSION= /etc/os-release | cut -d'=' -f2 | tr -d '"')
 
+if [[ "$OS_NAME" == "AlmaLinux" && "$OS_VERSION" == "8.9 (Midnight Oncilla)" ]]; then
+
+    echo "LANG=en_US.UTF-8" | sudo tee /etc/locale.conf
+    source /etc/locale.conf
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    echo "export LANG=en_US.UTF-8" >> ~/.bashrc
+    echo "export LC_ALL=en_US.UTF-8" >> ~/.bashrc
+    source ~/.bashrc
+
+    
 #Installing jq and yq
 dnf install -y jq
 wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
