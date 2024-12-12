@@ -67,6 +67,10 @@ if [[ "$OS_NAME" == "AlmaLinux" && "$OS_VERSION" == "8.9 (Midnight Oncilla)" ]];
     echo "export LANG=en_US.UTF-8" >> /root/.bashrc
     echo "export LC_ALL=en_US.UTF-8" >> /root/.bashrc
     source /root/.bashrc
+    echo "export LANG=en_US.UTF-8" >> /home/onecloud/.bashrc
+    echo "export LC_ALL=en_US.UTF-8" >> /home/onecloud/.bashrc
+    source /home/onecloud/.bashrc
+    
 fi
     
 
