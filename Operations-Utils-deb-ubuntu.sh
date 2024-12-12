@@ -30,14 +30,11 @@ sudo apt-get install -y curl
   # Restart Docker service
   sudo systemctl restart docker
 
-
-
 # Download the latest version of Docker Compose
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
 # Set executable permissions
 sudo chmod +x /usr/local/bin/docker-compose
-
 
 #install K9S
 wget -P /tmp https://github.com/derailed/k9s/releases/download/v0.32.6/k9s_linux_amd64.deb
@@ -57,20 +54,6 @@ curl -OL "https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.27
 tar -xvzf kubeseal-0.27.3-linux-amd64.tar.gz kubeseal
 sudo install -m 755 kubeseal /usr/local/bin/kubeseal
 
-# helm install
-
-curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-sudo apt-get install apt-transport-https --yes
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-sudo apt-get update
-sudo apt-get install helm
-
-#terraform install
-
-wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install terraform
-
 
 #install terragrunt
 
@@ -80,18 +63,48 @@ mv /tmp/terragrunt_linux_amd64 /tmp/terragrunt
 chmod u+x /tmp/terragrunt
 mv /tmp/terragrunt /usr/local/bin/terragrunt
 
-
-#install ansible
-
-sudo apt install software-properties-common -y
-sudo add-apt-repository --yes --update ppa:ansible/ansible
-sudo apt install ansible -y
-
-
 #Installing jq and yq
 sudo apt-get install -y jq 
 sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
 sudo mv yq_linux_amd64 /usr/bin/yq
 sudo chmod +x /usr/bin/yq
 
+# Check if the OS is Debian
+if [[ "$OS_NAME" == "Debian GNU/Linux 12 (bookworm)" ]]; then
+    echo "OS is Debian. Proceeding with locale configuration."
 
+    sudo apt-get update
+    sudo apt-get install locales -y
+    sudo sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
+    sudo locale-gen en_US.UTF-8
+
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+   echo "LC_ALL=C.UTF-8" >> /etc/environment
+   echo "LANG=C.UTF-8" >> /etc/environment
+
+    echo "export LANG=en_US.UTF-8" >> /root/.bashrc
+    echo "export LC_ALL=en_US.UTF-8" >> /root/.bashrc
+    source /root/.bashrc
+
+    echo "export LANG=en_US.UTF-8" >> /home/onecloud/.bashrc
+    echo "export LC_ALL=en_US.UTF-8" >> /home/onecloud/.bashrc
+    source /home/onecloud/.bashrc
+fi
+
+# helm install
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+sudo apt-get install apt-transport-https --yes
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+
+#terraform install
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+
+#install ansible
+sudo apt install software-properties-common -y
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
