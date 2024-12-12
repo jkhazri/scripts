@@ -45,6 +45,11 @@ mv /tmp/terragrunt_linux_amd64 /tmp/terragrunt
 chmod u+x /tmp/terragrunt
 mv /tmp/terragrunt /usr/bin/terragrunt
 
+#Installing jq and yq
+dnf install -y jq
+wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+chmod +x /usr/bin/yq 
+
 # ansible install
 sudo yum install epel-release -y
 sudo yum install ansible -y
@@ -53,7 +58,6 @@ OS_NAME=$(grep ^NAME= /etc/os-release | cut -d'=' -f2 | tr -d '"')
 OS_VERSION=$(grep ^VERSION= /etc/os-release | cut -d'=' -f2 | tr -d '"')
 
 if [[ "$OS_NAME" == "AlmaLinux" && "$OS_VERSION" == "8.9 (Midnight Oncilla)" ]]; then
-
     echo "LANG=en_US.UTF-8" | sudo tee /etc/locale.conf
     source /etc/locale.conf
     export LANG=en_US.UTF-8
@@ -63,7 +67,4 @@ if [[ "$OS_NAME" == "AlmaLinux" && "$OS_VERSION" == "8.9 (Midnight Oncilla)" ]];
     source ~/.bashrc
 
     
-#Installing jq and yq
-dnf install -y jq
-wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-chmod +x /usr/bin/yq
+
