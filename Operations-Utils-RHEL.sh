@@ -58,7 +58,7 @@ OS_NAME=$(grep ^NAME= /etc/os-release | cut -d'=' -f2 | tr -d '"')
 OS_VERSION=$(grep ^VERSION= /etc/os-release | cut -d'=' -f2 | tr -d '"')
 
 if [[ "$OS_NAME" == "AlmaLinux" && "$OS_VERSION" == "8.9 (Midnight Oncilla)" ]]; then
-    echo "LANG=en_US.UTF-8" | sudo tee /etc/locale.conf
+    echo "LANG=en_US.UTF-8" > /etc/locale.conf
     source /etc/locale.conf
     export LANG=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
