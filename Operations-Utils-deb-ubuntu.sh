@@ -88,3 +88,63 @@ sudo apt install terraform
 sudo apt install software-properties-common -y
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible -y
+
+
+#This part is only for Debian OS to fix the locale issue!
+
+#!/bin/bash
+
+# Get the operating system information
+OS_NAME=$(lsb_release -d | awk -F'\t' '{print $2}')
+
+# Check if the OS is Debian 12
+if [[ "$OS_NAME" == "Debian GNU/Linux 12 (bookworm)" ]]; then
+  echo "Detected OS: $OS_NAME. Proceeding with locale configuration..."
+
+  # Add missing locale to /etc/locale.gen
+  echo "Ensuring required locales are available..."
+  REQUIRED_LOCALE="ar_LY.UTF-8 UTF-8"
+  LOCALE_GEN_FILE="/etc/locale.gen"
+
+  if ! grep -q "^$REQUIRED_LOCALE" "$LOCALE_GEN_FILE"; then
+    echo "$REQUIRED_LOCALE" | sudo tee -a "$LOCALE_GEN_FILE"
+  else
+    echo "Locale $REQUIRED_LOCALE already exists in $LOCALE_GEN_FILE."
+  fi
+
+  # Generate locales
+  echo "Generating locales..."
+  sudo locale-gen
+
+  # Set system-wide locale
+  echo "Setting system-wide locale..."
+  DEFAULT_LOCALE_FILE="/etc/default/locale"
+  sudo bash -c "cat > $DEFAULT_LOCALE_FILE" <<EOL
+LANG=C.UTF-8
+LC_ALL=ar_LY.UTF-8
+EOL
+
+  # Export locale environment variables
+  echo "Exporting locale environment variables..."
+  PROFILE_FILE="/etc/profile"
+  if ! grep -q "export LC_ALL=ar_LY.UTF-8" "$PROFILE_FILE"; then
+    sudo bash -c "cat >> $PROFILE_FILE" <<EOL
+
+# Locale settings
+export LANG=C.UTF-8
+export LC_ALL=ar_LY.UTF-8
+EOL
+  fi
+
+  # Apply changes
+  echo "Applying locale changes..."
+  source /etc/profile
+
+  # Verify locales
+  echo "Verifying locale settings..."
+  locale
+
+  echo "Locale setup complete!"
+fi
+
+
