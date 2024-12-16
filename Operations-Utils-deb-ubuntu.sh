@@ -70,16 +70,28 @@ sudo mv yq_linux_amd64 /usr/bin/yq
 sudo chmod +x /usr/bin/yq
 
 # helm install
-curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+curl https://baltocdn.com/helm/signing.asc -o signing.asc
+gpg --dearmor signing.asc
+sudo mv signing.asc.gpg /usr/share/keyrings/helm.gpg
+rm signing.asc
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" > helm-stable-debian.list
+sudo mv helm-stable-debian.list /etc/apt/sources.list.d/helm-stable-debian.list
+
+
 sudo apt-get update
 sleep 5s
 sudo apt-get install apt-transport-https --yes
 sudo apt-get install helm
 
 #terraform install
-wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+wget -O hashicorp.gpg https://apt.releases.hashicorp.com/gpg
+sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg hashicorp.gpg
+rm hashicorp.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" > hashicorp.list
+sudo mv hashicorp.list /etc/apt/sources.list.d/hashicorp.list
+
 sudo apt update
 sleep 5s
 sudo apt install terraform
