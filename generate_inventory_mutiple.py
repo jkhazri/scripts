@@ -17,12 +17,10 @@ def generate_files(access_method, ip_addresses, usernames, ssh_password_storage_
         if not ssh_password_storage_path:
             print("ERROR: --ssh_password_storage_path is required for password authentication.")
             return
-        # Add any additional logic needed for password authentication
     elif access_method == "privatesshkey":
         if not ssh_key_storage_path:
             print("ERROR: --ssh_key_storage_path is required for private key authentication.")
             return
-        # Add any additional logic needed for private key authentication
     else:
         print("ERROR: Invalid access method. Use 'password' or 'privatesshkey'.")
         return
@@ -32,16 +30,28 @@ def generate_files(access_method, ip_addresses, usernames, ssh_password_storage_
 
     try:
         # Generate inventory.xml content
-        inventory_content = '<project>\n'
+        inventory_content = '<?xml version="1.0" ?>\n<project>\n'
         for ip, user, node in zip(ip_addresses, usernames, node_names):
             inventory_content += f'''  <node name="{node}"
-        description="Auto-generated node"
+        description="Server at {ip}"
+        tags="linux, server"
         hostname="{ip}"
-        osArch="x86_64"
-        osFamily="unix"
-        osName="Linux"
-        username="{user}" />\n'''
-        inventory_content += '</project>\n'
+        osArch=""
+        osFamily=""
+        osName=""
+        osVersion=""
+        username="{user}"
+        '''
+            if access_method == "privatesshkey":
+                inventory_content += f'''ssh-key-storage-path="{ssh_key_storage_path}"
+        ssh-authentication="privateKey"'''
+            elif access_method == "password":
+                inventory_content += f'''ssh-password-storage-path="{ssh_password_storage_path}"
+        ssh-authentication="password"'''
+            
+            inventory_content += " />\n"
+
+        inventory_content += "</project>\n"
 
         # Write inventory.xml
         with open(inventory_path, "w") as inventory_file:
