@@ -64,7 +64,7 @@ def generate_files(access_method, ip_addresses, usernames, ssh_password_storage_
         hosts_content = f"""[mylocal]
 {container_hostname} ansible_host=localhost ansible_user=rundeck ansible_password=rundeck ansible_become_password=rundeck
 
-[MvmNode]
+[{infra_groupname}]
 """
         for ip, user, node in zip(ip_addresses, usernames, node_names):
             hosts_content += f"{node} ansible_host={ip} ansible_user={user}\n"
