@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Parse arguments
+DOCKER_MODE=false
+for arg in "$@"; do
+    if [[ "$arg" == "--docker=true" ]]; then
+        DOCKER_MODE=true
+    fi
+done
+
 # Source os-release for distro info
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -22,6 +30,12 @@ elif [[ "$ID_LIKE" == *"rhel"* || "$ID_LIKE" == *"centos"* || "$ID_LIKE" == *"fe
 
     if [[ "$VERSION_ID" =~ ^8 ]]; then
         echo "Detected RHEL-like system version 8.x ($ID $VERSION_ID)"
+
+        if [ "$DOCKER_MODE" = false ]; then
+            echo "glibc version is lower or equal to 2.28. Please rerun the script with the option --docker=true to install it."
+            exit 1
+        fi
+
         curl https://raw.githubusercontent.com/jkhazri/scripts/refs/heads/main/install-sshlog-forRHELV8.sh | sh
         GENERATE_CONFIG=false
 
