@@ -32,7 +32,7 @@ elif [[ "$ID_LIKE" == *"rhel"* || "$ID_LIKE" == *"centos"* || "$ID_LIKE" == *"fe
         echo "Detected RHEL-like system version 8.x ($ID $VERSION_ID)"
 
         if [ "$DOCKER_MODE" = false ]; then
-            echo "glibc version is lower or equal to 2.28. Please rerun the script with the option --docker=true to install it."
+            echo "glibc version is lower or equal to 2.28. Please rerun the script with the option --docker=true to install it. NOTE : if docker is not already installed this option will install it "
             exit 1
         fi
 
