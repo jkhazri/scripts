@@ -19,10 +19,10 @@ def parse_args():
     parser.add_argument('--node_names_K8S_Master', required=True)
     parser.add_argument('--infra_groupname_K8S_Master', required=True)
 
-    parser.add_argument('--ip_addresses_K8S_Slave', required=True)
-    parser.add_argument('--usernames_K8S_Slave', required=True)
-    parser.add_argument('--node_names_K8S_Slave', required=True)
-    parser.add_argument('--infra_groupname_K8S_Slave', required=True)
+    parser.add_argument('--ip_addresses_K8S_Slave', default='')
+    parser.add_argument('--usernames_K8S_Slave', default='')
+    parser.add_argument('--node_names_K8S_Slave', default='')
+    parser.add_argument('--infra_groupname_K8S_Slave', default='')
 
     return parser.parse_args()
 
@@ -55,14 +55,18 @@ def main():
     args = parse_args()
 
     # MASTER
-    master_ips = [ip.strip() for ip in args.ip_addresses_K8S_Master.split(',')]
+    master_ips = [ip.strip() for ip in args.ip_addresses_K8S_Master.split(',') if ip.strip()]
     master_users = split_and_validate(args.usernames_K8S_Master, len(master_ips), 'usernames_K8S_Master')
     master_nodes = split_and_validate(args.node_names_K8S_Master, len(master_ips), 'node_names_K8S_Master')
 
-    # SLAVE
-    slave_ips = [ip.strip() for ip in args.ip_addresses_K8S_Slave.split(',')]
-    slave_users = split_and_validate(args.usernames_K8S_Slave, len(slave_ips), 'usernames_K8S_Slave')
-    slave_nodes = split_and_validate(args.node_names_K8S_Slave, len(slave_ips), 'node_names_K8S_Slave')
+    # SLAVE (conditionally parse)
+    slave_nodes = slave_ips = slave_users = []
+    include_slaves = all([args.ip_addresses_K8S_Slave.strip(), args.usernames_K8S_Slave.strip(), args.node_names_K8S_Slave.strip()])
+
+    if include_slaves:
+        slave_ips = [ip.strip() for ip in args.ip_addresses_K8S_Slave.split(',') if ip.strip()]
+        slave_users = split_and_validate(args.usernames_K8S_Slave, len(slave_ips), 'usernames_K8S_Slave')
+        slave_nodes = split_and_validate(args.node_names_K8S_Slave, len(slave_ips), 'node_names_K8S_Slave')
 
     # --------- INI GENERATION ---------
     ini_lines = []
@@ -73,8 +77,12 @@ def main():
 
     ini_lines += generate_inventory_section(args.infra_groupname_K8S_Master, master_nodes, master_ips, master_users)
     ini_lines.append("")
-    ini_lines += generate_inventory_section(args.infra_groupname_K8S_Slave, slave_nodes, slave_ips, slave_users)
-    ini_lines.append("")
+
+    if include_slaves:
+        ini_lines += generate_inventory_section(args.infra_groupname_K8S_Slave, slave_nodes, slave_ips, slave_users)
+        ini_lines.append("")
+    else:
+        print("No Slave nodes defined, skipping Slave inventory.")
 
     # Write INI to /etc/ansible/hosts
     hosts_path = Path("/etc/ansible/hosts")
@@ -99,8 +107,9 @@ def main():
         generate_xml_node(project, name, ip, user, args.infra_groupname_K8S_Master, args.ssh_key_storage_path)
 
     # Slave Nodes
-    for name, ip, user in zip(slave_nodes, slave_ips, slave_users):
-        generate_xml_node(project, name, ip, user, args.infra_groupname_K8S_Slave, args.ssh_key_storage_path)
+    if include_slaves:
+        for name, ip, user in zip(slave_nodes, slave_ips, slave_users):
+            generate_xml_node(project, name, ip, user, args.infra_groupname_K8S_Slave, args.ssh_key_storage_path)
 
     # Write XML to /etc/ansible/inventory.xml
     inventory_xml_path = Path("/etc/ansible/inventory.xml")
