@@ -6,13 +6,7 @@ sudo python3 generate_inventory_mutiple.py     --access_method "privatesshkey"  
 
 ## generate_inventory_Patch.py is the script that addsa  new Ansible script named impacted_server
 
-python3 generate_inventory_Patch.py \
---access_method password \
---ip_addresses "192.168.1.3,192.168.1.5" \
---usernames "userFORD,userTESLA" \
---ssh_password_storage_path key/hobohobo \
---infra_groupname impacted_server \
---node_names "node-33,node-55"
+python3 generate_inventory_Patch.py --access_method password --ip_addresses "192.168.1.3,192.168.1.5" --usernames "userFORD,userTESLA" --ssh_password_storage_path key/hobohobo --infra_groupname impacted_server --node_names "node-33,node-55"
 
 
 
